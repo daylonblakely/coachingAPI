@@ -16,3 +16,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: dblakely1/practice-plans
+      context: practice-plans
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

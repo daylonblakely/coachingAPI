@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: practice-plans-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: practice-plans
+  template:
+    metadata:
+      labels:
+        app: practice-plans
+    spec:
+      containers:
+        - name: practice-plans
+          image: dblakely1/practice-plans
+          env:
+            - name: MONGO_URI
+              value: "mongodb://practice-plans-mongo-srv:27017/practice-plans"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: practice-plans-srv
+spec:
+  selector:
+    app: practice-plans
+  ports:
+    - name: practice-plans
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
