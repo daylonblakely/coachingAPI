@@ -15,16 +15,16 @@ router.post(
       .isEmpty()
       .withMessage("A title is required when creating a practice plan"),
     body("date").not().isEmpty().withMessage("A valid date is required"),
-    body("minutes")
+    body("minutes") // optional
       .if(body("minutes").exists())
       .isFloat({ gt: 0 })
       .withMessage("Practice length (in minutes) must be greater than 0"),
-    body("seasonId").if(body("seasonId").exists()).isString(),
-    body("practiceNumber")
+    body("seasonId").if(body("seasonId").exists()).isString(), // optional
+    body("practiceNumber") // optional
       .if(body("practiceNumber").exists())
       .isFloat({ gt: 0 })
       .withMessage("Practice number must be greater than 0"),
-    body("comments").if(body("comments").exists()).isString(),
+    body("comments").if(body("comments").exists()).isString(), // optional
   ],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -36,6 +36,8 @@ router.post(
       practiceNumber,
       comments,
     } = req.body;
+
+    // TODO check for valid seasonId if exists
 
     const plan = PracticePlan.build({
       title,
