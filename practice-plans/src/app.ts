@@ -9,7 +9,8 @@ import {
 } from "@dbticketsudemy/common";
 
 import { createPlanRouter } from "./routes/new";
-import {showPlanRouter} from "./routes/show";
+import { showPlanRouter } from "./routes/show";
+import { updatePlanRouter } from "./routes/update";
 
 const app = express();
 app.set("trust proxy", true); //because of ingress nginx proxy
@@ -27,6 +28,7 @@ app.use(currentUser);
 // Routes
 app.use(createPlanRouter);
 app.use(showPlanRouter);
+app.use(updatePlanRouter);
 
 app.all("*", async (req, res) => {
   throw new NotFoundError();

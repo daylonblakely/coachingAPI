@@ -1,13 +1,18 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { requireAuth, validateRequest } from "@dbticketsudemy/common";
+import {
+  requireAuth,
+  validateRequest,
+  NotFoundError,
+  NotAuthorizedError,
+} from "@dbticketsudemy/common";
 
 import { PracticePlan } from "../models/practicePlan";
 
 const router = express.Router();
 
-router.post(
-  "/api/practice-plans",
+router.put(
+  "/api/practice-plans/:id",
   requireAuth,
   [
     body("title")
@@ -40,22 +45,30 @@ router.post(
       comments,
     } = req.body;
 
-    // TODO check for valid seasonId if exists
+    const plan = await PracticePlan.findById(req.params.id);
 
-    const plan = PracticePlan.build({
+    if (!plan) {
+      throw new NotFoundError();
+    }
+
+    //   check that user owns the plan
+    if (plan.userId !== req.currentUser!.id) {
+      throw new NotAuthorizedError();
+    }
+
+    // update the plan
+    plan.set({
       title,
       date,
       minutes,
       seasonId,
       practiceNumber,
       comments,
-      userId: req.currentUser!.id,
     });
-
     await plan.save();
 
-    res.status(201).send(plan);
+    res.send(plan);
   }
 );
 
-export { router as createPlanRouter };
+export { router as updatePlanRouter };
