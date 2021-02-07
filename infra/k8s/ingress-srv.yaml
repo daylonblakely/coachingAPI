@@ -16,5 +16,5 @@ spec:
               servicePort: 3000
           - path: /api/practice-plans/?(.*)
             backend:
-              serviceName: auth-srv
+              serviceName: practice-plans-srv
               servicePort: 3000

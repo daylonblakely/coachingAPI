@@ -11,6 +11,7 @@ import {
 import { createPlanRouter } from "./routes/new";
 import { showPlanRouter } from "./routes/show";
 import { updatePlanRouter } from "./routes/update";
+import { indexPlanRouter } from "./routes/index";
 
 const app = express();
 app.set("trust proxy", true); //because of ingress nginx proxy
@@ -26,6 +27,7 @@ app.use(
 app.use(currentUser);
 
 // Routes
+app.use(indexPlanRouter);
 app.use(createPlanRouter);
 app.use(showPlanRouter);
 app.use(updatePlanRouter);
