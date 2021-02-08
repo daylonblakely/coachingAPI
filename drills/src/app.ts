@@ -8,6 +8,8 @@ import {
   currentUser,
 } from "@dbticketsudemy/common";
 
+import { createDrillRouter } from "./routes/new";
+
 const app = express();
 app.set("trust proxy", true); //because of ingress nginx proxy
 app.use(json());
@@ -22,6 +24,7 @@ app.use(
 app.use(currentUser);
 
 // Routes
+app.use(createDrillRouter);
 
 app.all("*", async (req, res) => {
   throw new NotFoundError();
