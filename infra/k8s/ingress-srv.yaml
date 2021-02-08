@@ -18,3 +18,7 @@ spec:
             backend:
               serviceName: practice-plans-srv
               servicePort: 3000
+          - path: /api/drills/?(.*)
+            backend:
+              serviceName: drills-srv
+              servicePort: 3000

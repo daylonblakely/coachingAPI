@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drills-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drills
+  template:
+    metadata:
+      labels:
+        app: drills
+    spec:
+      containers:
+        - name: drills
+          image: dblakely1/drills
+          env:
+            - name: MONGO_URI
+              value: "mongodb://drills-mongo-srv:27017/drills"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: drills-srv
+spec:
+  selector:
+    app: drills
+  ports:
+    - name: drills
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
