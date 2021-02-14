@@ -1,14 +1,14 @@
-import express, { Request, Response } from "express";
-import { requireAuth } from "@dbticketsudemy/common";
-import { drillSchema } from "../models/drillValidationSchema";
-import { validateSchema } from "../middlewares/joiValidateSchema";
+import express, { Request, Response } from 'express';
+import { requireAuth } from '@db-coaching/common';
+import { drillSchema } from '../models/drillValidationSchema';
+import { validateSchema } from '@db-coaching/common';
 
-import { Drill } from "../models/drill";
+import { Drill } from '../models/drill';
 
 const router = express.Router();
 
 router.post(
-  "/api/drills",
+  '/api/drills',
   requireAuth,
   validateSchema(drillSchema),
   async (req: Request, res: Response) => {

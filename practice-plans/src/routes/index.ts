@@ -1,11 +1,11 @@
-import express, { Request, Response } from "express";
-import { requireAuth } from "@dbticketsudemy/common";
-import { PracticePlan } from "../models/practicePlan";
+import express, { Request, Response } from 'express';
+import { requireAuth } from '@db-coaching/common';
+import { PracticePlan } from '../models/practicePlan';
 
 const router = express.Router();
 
 router.get(
-  "/api/practice-plans",
+  '/api/practice-plans',
   requireAuth,
   async (req: Request, res: Response) => {
     // get all plans for a signed in user

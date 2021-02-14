@@ -1,16 +1,16 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response } from 'express';
 import {
   requireAuth,
   NotFoundError,
   NotAuthorizedError,
-} from "@dbticketsudemy/common";
+} from '@db-coaching/common';
 
-import { PracticePlan } from "../models/practicePlan";
+import { PracticePlan } from '../models/practicePlan';
 
 const router = express.Router();
 
 router.get(
-  "/api/practice-plans/:id",
+  '/api/practice-plans/:id',
   requireAuth,
   async (req: Request, res: Response) => {
     const plan = await PracticePlan.findById(req.params.id);

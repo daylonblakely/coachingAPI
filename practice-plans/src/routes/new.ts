@@ -1,33 +1,33 @@
-import express, { Request, Response } from "express";
-import { body } from "express-validator";
-import { requireAuth, validateRequest } from "@dbticketsudemy/common";
+import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
+import { requireAuth, validateRequest } from '@db-coaching/common';
 
-import { PracticePlan } from "../models/practicePlan";
+import { PracticePlan } from '../models/practicePlan';
 
 const router = express.Router();
 
 router.post(
-  "/api/practice-plans",
+  '/api/practice-plans',
   requireAuth,
   [
-    body("title")
+    body('title')
       .not()
       .isEmpty()
-      .withMessage("A title is required when creating a practice plan"),
-    body("date").not().isEmpty().withMessage("A valid date is required"),
-    body("minutes") // optional
-      .if(body("minutes").exists())
+      .withMessage('A title is required when creating a practice plan'),
+    body('date').not().isEmpty().withMessage('A valid date is required'),
+    body('minutes') // optional
+      .if(body('minutes').exists())
       .isFloat({ gt: 0 })
-      .withMessage("Practice length (in minutes) must be greater than 0"),
-    body("seasonId").if(body("seasonId").exists()).isString(), // optional
-    body("practiceNumber") // optional
-      .if(body("practiceNumber").exists())
+      .withMessage('Practice length (in minutes) must be greater than 0'),
+    body('seasonId').if(body('seasonId').exists()).isString(), // optional
+    body('practiceNumber') // optional
+      .if(body('practiceNumber').exists())
       .isFloat({ gt: 0 })
-      .withMessage("Practice number must be greater than 0"),
-    body("comments")
-      .if(body("comments").exists())
+      .withMessage('Practice number must be greater than 0'),
+    body('comments')
+      .if(body('comments').exists())
       .isString()
-      .withMessage("Comments must be a valid string"), // optional
+      .withMessage('Comments must be a valid string'), // optional
   ],
   validateRequest,
   async (req: Request, res: Response) => {
