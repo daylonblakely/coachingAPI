@@ -3,6 +3,9 @@ import { body } from 'express-validator';
 import { requireAuth, validateRequest } from '@db-coaching/common';
 
 import { PracticePlan } from '../models/practicePlan';
+// events
+import { natsWrapper } from '../nats-wrapper';
+import { PlanCreatedPublisher } from '../events/publishers/plan-created-publisher';
 
 const router = express.Router();
 
@@ -53,6 +56,13 @@ router.post(
     });
 
     await plan.save();
+
+    // publish plan created event
+    new PlanCreatedPublisher(natsWrapper.client).publish({
+      id: plan.id,
+      title: plan.title,
+      seasonId: plan.seasonId,
+    });
 
     res.status(201).send(plan);
   }

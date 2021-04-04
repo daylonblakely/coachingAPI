@@ -16,6 +16,14 @@ spec:
         - name: practice-plans
           image: dblakely1/practice-plans
           env:
+          - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: coaching
             - name: MONGO_URI
               value: "mongodb://practice-plans-mongo-srv:27017/practice-plans"
             - name: JWT_KEY

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 import { app } from './app';
+import { natsWrapper } from './nats-wrapper';
 
 // connect to mongo address from depl
 const start = async () => {
@@ -12,7 +13,34 @@ const start = async () => {
     throw new Error('MONGO_URI must be defined');
   }
 
+  if (!process.env.NATS_CLIENT_ID) {
+    throw new Error('NATS_CLIENT_ID must be defined');
+  }
+
+  if (!process.env.NATS_URL) {
+    throw new Error('NATS_URL must be defined');
+  }
+
+  if (!process.env.NATS_CLUSTER_ID) {
+    throw new Error('NATS_CLUSTER_ID must be defined');
+  }
+
   try {
+    await natsWrapper.connect(
+      process.env.NATS_CLUSTER_ID,
+      process.env.NATS_CLIENT_ID,
+      process.env.NATS_URL
+    );
+
+    // handle close to prevent NATS from thinking dead clients are still alive
+    natsWrapper.client.on('close', () => {
+      console.log('NATS connection closed');
+      process.exit();
+    });
+    // handle interupt signals ex: ctrl+c, rs
+    process.on('SIGINT', () => natsWrapper.client.close());
+    process.on('SIGTERM', () => natsWrapper.client.close());
+
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

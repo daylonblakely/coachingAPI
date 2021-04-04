@@ -37,6 +37,8 @@ router.post(
 
     await drill.save();
 
+    // TODO emit drill created event
+
     res.status(201).send(drill);
   }
 );
