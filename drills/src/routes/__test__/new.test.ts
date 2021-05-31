@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
-
 import { Drill } from '../../models/drill';
+import { natsWrapper } from '../../nats-wrapper';
 
 it('has a route handler listening to /api/drills for post requests', async () => {
   const response = await request(app).post('/api/drills').send({});
@@ -28,7 +28,6 @@ it('returns an error if an invalid title is provided', async () => {
     .set('Cookie', global.signin())
     .send({
       title: '',
-      minutes: 45,
       comments: '',
     })
     .expect(400);
@@ -37,19 +36,6 @@ it('returns an error if an invalid title is provided', async () => {
     .post('/api/drills')
     .set('Cookie', global.signin())
     .send({
-      minutes: 45,
-      comments: '',
-    })
-    .expect(400);
-});
-
-it('returns an error if an invalid minutes is provided', async () => {
-  await request(app)
-    .post('/api/drills')
-    .set('Cookie', global.signin())
-    .send({
-      title: 'ageaegawg',
-      minutes: 'dsafsadf',
       comments: '',
     })
     .expect(400);
@@ -84,7 +70,6 @@ it('creates a plan with valid inputs', async () => {
       title,
       description: 'aldkjasljf',
       category: 'Offense',
-      minutes: 45,
       comments: 'comment',
     })
     .expect(201);
@@ -108,8 +93,18 @@ it('creates a plan with valid inputs', async () => {
 
   drills = await Drill.find({});
   expect(drills.length).toEqual(3);
-  expect(drills[0].minutes).toEqual(45);
   expect(drills[0].title).toEqual(title);
 });
 
-it.todo('emits a drill created event');
+it('emits a drill created event', async () => {
+  await request(app)
+    .post('/api/drills')
+    .set('Cookie', global.signin())
+    .send({
+      title: 'passing',
+      userId: 'alkjflakj',
+    })
+    .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+});

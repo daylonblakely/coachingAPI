@@ -4,6 +4,8 @@ import { drillSchema } from '../models/drillValidationSchema';
 import { validateSchema } from '@db-coaching/common';
 
 import { Drill } from '../models/drill';
+import { natsWrapper } from '../nats-wrapper';
+import { DrillCreatedPublisher } from '../events/publishers/drill-created-publisher';
 
 const router = express.Router();
 
@@ -12,15 +14,7 @@ router.post(
   requireAuth,
   validateSchema(drillSchema),
   async (req: Request, res: Response) => {
-    const {
-      title,
-      description,
-      category,
-      minutes,
-      startTime,
-      comments,
-      practicePlanId,
-    } = req.body;
+    const { title, description, category, comments } = req.body;
 
     // TODO check for valid practicePlanId if exists
 
@@ -28,16 +22,22 @@ router.post(
       title,
       description,
       category,
-      minutes,
-      startTime,
       comments,
-      practicePlanId,
       userId: req.currentUser!.id,
     });
 
     await drill.save();
 
-    // TODO emit drill created event
+    // emit drill created event
+    new DrillCreatedPublisher(natsWrapper.client).publish({
+      id: drill.id,
+      version: drill.version,
+      title: drill.title,
+      description: drill.description,
+      category: drill.category,
+      comments: drill.comments,
+      userId: drill.userId,
+    });
 
     res.status(201).send(drill);
   }

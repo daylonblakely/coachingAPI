@@ -1,23 +1,14 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { DrillCategories } from '@db-coaching/common';
 
 // an interface that describes the properties
 // required to create a new Drill
 interface DrillAttrs {
   title: string;
   description?: string;
-  category?:
-    | "Offense"
-    | "Defense"
-    | "Rebounding"
-    | "Transition"
-    | "Passing"
-    | "Ball Handling"
-    | "Shooting"
-    | "Other";
-  minutes?: number; //length in minutes
-  startTime?: Date;
+  category?: DrillCategories;
   comments?: string;
-  practicePlanId?: string;
   userId: string;
 }
 
@@ -26,20 +17,10 @@ interface DrillAttrs {
 interface DrillDoc extends mongoose.Document {
   title: string;
   description?: string;
-  category?:
-    | "Offense"
-    | "Defense"
-    | "Rebounding"
-    | "Transition"
-    | "Passing"
-    | "Ball Handling"
-    | "Shooting"
-    | "Other";
-  minutes?: number; //length in minutes
-  startTime?: Date;
+  category?: DrillCategories;
   comments?: string;
-  practicePlanId?: string;
   userId: string;
+  version: number;
 }
 
 // an interface that describes the properties
@@ -62,19 +43,7 @@ const drillSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    minutes: {
-      type: Number,
-      required: false,
-    },
-    startTime: {
-      type: Date,
-      required: false,
-    },
     comments: {
-      type: String,
-      required: false,
-    },
-    practicePlanId: {
       type: String,
       required: false,
     },
@@ -94,10 +63,14 @@ const drillSchema = new mongoose.Schema(
   }
 );
 
+// track version of drill
+drillSchema.set('versionKey', 'version');
+drillSchema.plugin(updateIfCurrentPlugin);
+
 drillSchema.statics.build = (attrs: DrillAttrs) => {
   return new Drill(attrs);
 };
 
-const Drill = mongoose.model<DrillDoc, DrillModel>("Drill", drillSchema);
+const Drill = mongoose.model<DrillDoc, DrillModel>('Drill', drillSchema);
 
 export { Drill };
