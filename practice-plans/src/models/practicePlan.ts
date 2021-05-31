@@ -1,4 +1,6 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { DrillDoc } from './drill';
 
 // an interface that describes the properties
 // required to create a new PracticePlan
@@ -6,9 +8,9 @@ interface PracticePlanAttrs {
   title: string;
   date: Date;
   minutes?: number; //length in minutes
-  seasonId?: string;
   practiceNumber?: number;
   comments?: string;
+  drills?: Array<DrillDoc>;
   userId: string;
 }
 
@@ -18,10 +20,11 @@ interface PracticePlanDoc extends mongoose.Document {
   title: string;
   date: Date;
   minutes?: number; //length in minutes
-  seasonId?: string;
   practiceNumber?: number;
   comments?: string;
+  drills?: Array<DrillDoc>;
   userId: string;
+  version: number;
 }
 
 // an interface that describes the properties
@@ -44,10 +47,6 @@ const practicePlanSchema = new mongoose.Schema(
       type: Number,
       required: false,
     },
-    seasonId: {
-      type: String,
-      required: false,
-    },
     practiceNumber: {
       type: Number,
       required: false,
@@ -56,6 +55,12 @@ const practicePlanSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    drills: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Drill',
+      },
+    ],
     userId: {
       type: String,
       required: true,
@@ -72,12 +77,15 @@ const practicePlanSchema = new mongoose.Schema(
   }
 );
 
+practicePlanSchema.set('versionKey', 'version');
+practicePlanSchema.plugin(updateIfCurrentPlugin);
+
 practicePlanSchema.statics.build = (attrs: PracticePlanAttrs) => {
   return new PracticePlan(attrs);
 };
 
 const PracticePlan = mongoose.model<PracticePlanDoc, PracticePlanModel>(
-  "PracticePlan",
+  'PracticePlan',
   practicePlanSchema
 );
 

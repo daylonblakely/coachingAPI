@@ -22,7 +22,6 @@ router.post(
       .if(body('minutes').exists())
       .isFloat({ gt: 0 })
       .withMessage('Practice length (in minutes) must be greater than 0'),
-    body('seasonId').if(body('seasonId').exists()).isString(), // optional
     body('practiceNumber') // optional
       .if(body('practiceNumber').exists())
       .isFloat({ gt: 0 })
@@ -34,24 +33,15 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const {
-      title,
-      date,
-      minutes,
-      seasonId,
-      practiceNumber,
-      comments,
-    } = req.body;
-
-    // TODO check for valid seasonId if exists
+    const { title, date, minutes, practiceNumber, comments, drills } = req.body;
 
     const plan = PracticePlan.build({
       title,
       date,
       minutes,
-      seasonId,
       practiceNumber,
       comments,
+      drills,
       userId: req.currentUser!.id,
     });
 
@@ -61,7 +51,6 @@ router.post(
     new PlanCreatedPublisher(natsWrapper.client).publish({
       id: plan.id,
       title: plan.title,
-      seasonId: plan.seasonId,
     });
 
     res.status(201).send(plan);

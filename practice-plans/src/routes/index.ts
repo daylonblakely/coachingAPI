@@ -9,7 +9,9 @@ router.get(
   requireAuth,
   async (req: Request, res: Response) => {
     // get all plans for a signed in user
-    const plans = await PracticePlan.find({ userId: req.currentUser!.id });
+    const plans = await PracticePlan.find({
+      userId: req.currentUser!.id,
+    }).populate('drills');
 
     res.send(plans);
   }

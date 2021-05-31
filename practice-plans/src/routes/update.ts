@@ -24,7 +24,6 @@ router.put(
       .if(body('minutes').exists())
       .isFloat({ gt: 0 })
       .withMessage('Practice length (in minutes) must be greater than 0'),
-    body('seasonId').if(body('seasonId').exists()).isString(), // optional
     body('practiceNumber') // optional
       .if(body('practiceNumber').exists())
       .isFloat({ gt: 0 })
@@ -36,14 +35,7 @@ router.put(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const {
-      title,
-      date,
-      minutes,
-      seasonId,
-      practiceNumber,
-      comments,
-    } = req.body;
+    const { title, date, minutes, practiceNumber, comments, drills } = req.body;
 
     const plan = await PracticePlan.findById(req.params.id);
 
@@ -61,9 +53,9 @@ router.put(
       title,
       date,
       minutes,
-      seasonId,
       practiceNumber,
       comments,
+      drills,
     });
     await plan.save();
 

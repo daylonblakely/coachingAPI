@@ -13,7 +13,7 @@ router.get(
   '/api/practice-plans/:id',
   requireAuth,
   async (req: Request, res: Response) => {
-    const plan = await PracticePlan.findById(req.params.id);
+    const plan = await PracticePlan.findById(req.params.id).populate('drills');
 
     if (!plan) {
       throw new NotFoundError();

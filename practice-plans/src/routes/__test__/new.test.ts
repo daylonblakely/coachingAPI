@@ -1,7 +1,9 @@
 import request from 'supertest';
+import mongoose from 'mongoose';
 import { app } from '../../app';
 import { PracticePlan } from '../../models/practicePlan';
 import { natsWrapper } from '../../nats-wrapper';
+import { Drill } from '../../models/drill';
 
 it('has a route handler listening to /api/practice-plans for post requests', async () => {
   const response = await request(app).post('/api/practice-plans').send({});
@@ -106,6 +108,26 @@ it('creates a plan with valid inputs', async () => {
   let plans = await PracticePlan.find({});
   expect(plans.length).toEqual(0);
 
+  const drill1 = Drill.build({
+    id: mongoose.Types.ObjectId().toHexString(),
+    title: 'test',
+    description: 'test',
+    category: 'Offense',
+    comments: 'test',
+    userId: 'aaaa',
+  });
+
+  const drill2 = Drill.build({
+    id: mongoose.Types.ObjectId().toHexString(),
+    title: 'test',
+    description: 'test',
+    category: 'Offense',
+    comments: 'test',
+    userId: 'aaaa',
+  });
+  await drill1.save();
+  await drill2.save();
+
   const title = 'Test plan title';
 
   await request(app)
@@ -117,6 +139,7 @@ it('creates a plan with valid inputs', async () => {
       date: new Date(),
       practiceNumber: 10,
       comments: 'comment',
+      drills: [drill1.id, drill2.id],
     })
     .expect(201);
 
@@ -128,6 +151,7 @@ it('creates a plan with valid inputs', async () => {
       date: new Date(),
       seasonId: 'afadsf',
       comments: 'comment',
+      drills: [drill1.id, drill2.id],
     })
     .expect(201);
 
