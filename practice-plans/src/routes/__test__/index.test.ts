@@ -1,19 +1,35 @@
-import request from "supertest";
-import { app } from "../../app";
+import request from 'supertest';
+import mongoose from 'mongoose';
+import { app } from '../../app';
+import { Drill } from '../../models/drill';
 
-const createPlan = (cookie: string[]) => {
-  return request(app).post("/api/practice-plans").set("Cookie", cookie).send({
-    title: "afdsfas",
-    date: new Date(),
-    comments: "affdjasfklj",
+const createPlan = async (cookie: string[]) => {
+  const drill = Drill.build({
+    id: mongoose.Types.ObjectId().toHexString(),
+    title: 'test',
+    description: 'test',
+    category: 'Offense',
+    comments: 'test',
+    userId: 'aaaa',
   });
+  await drill.save();
+
+  return request(app)
+    .post('/api/practice-plans')
+    .set('Cookie', cookie)
+    .send({
+      title: 'afdsfas',
+      date: new Date(),
+      comments: 'affdjasfklj',
+      drills: [drill.id],
+    });
 };
 
-it("returns a 400 if not authenticated", async () => {
-  await request(app).get("/api/practice-plans").send().expect(401);
+it('returns a 401 if not authenticated', async () => {
+  await request(app).get('/api/practice-plans').send().expect(401);
 });
 
-it("can fetch a list of users practice plans", async () => {
+it('can fetch a list of users practice plans', async () => {
   const userCookie = global.signin();
 
   await createPlan(userCookie);
@@ -21,8 +37,8 @@ it("can fetch a list of users practice plans", async () => {
   await createPlan(userCookie);
 
   const response = await request(app)
-    .get("/api/practice-plans")
-    .set("Cookie", userCookie)
+    .get('/api/practice-plans')
+    .set('Cookie', userCookie)
     .send()
     .expect(200);
 

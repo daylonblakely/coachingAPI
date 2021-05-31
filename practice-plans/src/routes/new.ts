@@ -51,6 +51,7 @@ router.post(
     new PlanCreatedPublisher(natsWrapper.client).publish({
       id: plan.id,
       title: plan.title,
+      userId: plan.userId,
     });
 
     res.status(201).send(plan);
