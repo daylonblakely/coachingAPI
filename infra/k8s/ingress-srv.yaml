@@ -1,24 +1,32 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-service
+  name: ingress-srv
   annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/ingress.class: 'nginx'
 spec:
   rules:
     - host: coaching.dev
       http:
         paths:
-          - path: /api/users/?(.*)
+          - path: /api/users
+            pathType: Prefix
             backend:
-              serviceName: auth-srv
-              servicePort: 3000
-          - path: /api/practice-plans/?(.*)
+              service:
+                name: auth-srv
+                port:
+                  number: 3000
+          - path: /api/practice-plans
+            pathType: Prefix
             backend:
-              serviceName: practice-plans-srv
-              servicePort: 3000
-          - path: /api/drills/?(.*)
+              service:
+                name: practice-plans-srv
+                port:
+                  number: 3000
+          - path: /api/drills
+            pathType: Prefix
             backend:
-              serviceName: drills-srv
-              servicePort: 3000
+              service:
+                name: drills-srv
+                port:
+                  number: 3000
