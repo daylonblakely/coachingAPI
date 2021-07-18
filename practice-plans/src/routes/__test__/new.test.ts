@@ -139,7 +139,10 @@ it('creates a plan with valid inputs', async () => {
       date: new Date(),
       practiceNumber: 10,
       comments: 'comment',
-      drills: [drill1.id, drill2.id],
+      drills: [
+        { drill: drill1.id, duration: 20 },
+        { drill: drill2.id, comments: 'test' },
+      ],
     })
     .expect(201);
 
@@ -151,7 +154,10 @@ it('creates a plan with valid inputs', async () => {
       date: new Date(),
       seasonId: 'afadsf',
       comments: 'comment',
-      drills: [drill1.id, drill2.id],
+      drills: [
+        { drill: drill1.id, duration: 20 },
+        { drill: drill2.id, comments: 'test' },
+      ],
     })
     .expect(201);
 

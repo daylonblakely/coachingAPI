@@ -11,7 +11,7 @@ router.get(
     // get all plans for a signed in user
     const plans = await PracticePlan.find({
       userId: req.currentUser!.id,
-    }).populate('drills');
+    }).populate('drills.drill');
 
     res.send(plans);
   }

@@ -2,6 +2,13 @@ import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { DrillDoc } from './drill';
 
+// an interface that allows practice specific fields to be added to a drill
+interface PracticeDrill {
+  drill: DrillDoc;
+  duration?: number; //minutes
+  comments?: string;
+}
+
 // an interface that describes the properties
 // required to create a new PracticePlan
 interface PracticePlanAttrs {
@@ -10,7 +17,7 @@ interface PracticePlanAttrs {
   minutes?: number; //length in minutes
   practiceNumber?: number;
   comments?: string;
-  drills?: Array<DrillDoc>;
+  drills?: Array<PracticeDrill>;
   userId: string;
 }
 
@@ -22,7 +29,7 @@ interface PracticePlanDoc extends mongoose.Document {
   minutes?: number; //length in minutes
   practiceNumber?: number;
   comments?: string;
-  drills?: Array<DrillDoc>;
+  drills?: Array<PracticeDrill>;
   userId: string;
   version: number;
 }
@@ -57,8 +64,18 @@ const practicePlanSchema = new mongoose.Schema(
     },
     drills: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Drill',
+        drill: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Drill',
+        },
+        duration: {
+          type: Number,
+          required: false,
+        },
+        comments: {
+          type: String,
+          required: false,
+        },
       },
     ],
     userId: {

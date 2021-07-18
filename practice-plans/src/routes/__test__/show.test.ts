@@ -72,7 +72,7 @@ it('returns the plan if the plan is found', async () => {
       title,
       date,
       comments,
-      drills: [drill1.id],
+      drills: [{ drill: drill1.id }],
     })
     .expect(201);
 
@@ -84,5 +84,5 @@ it('returns the plan if the plan is found', async () => {
 
   expect(planResponse.body.title).toEqual(title);
   expect(planResponse.body.comments).toEqual(comments);
-  expect(planResponse.body.drills[0].id).toEqual(drill1.id);
+  expect(planResponse.body.drills[0].drill.id).toEqual(drill1.id);
 });

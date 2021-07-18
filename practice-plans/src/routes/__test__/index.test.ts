@@ -21,7 +21,7 @@ const createPlan = async (cookie: string[]) => {
       title: 'afdsfas',
       date: new Date(),
       comments: 'affdjasfklj',
-      drills: [drill.id],
+      drills: [{ drill: drill.id, duration: 15, comments: '' }],
     });
 };
 

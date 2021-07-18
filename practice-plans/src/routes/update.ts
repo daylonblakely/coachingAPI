@@ -37,7 +37,9 @@ router.put(
   async (req: Request, res: Response) => {
     const { title, date, minutes, practiceNumber, comments, drills } = req.body;
 
-    const plan = await PracticePlan.findById(req.params.id);
+    const plan = await PracticePlan.findById(req.params.id).populate(
+      'drills.drill'
+    );
 
     if (!plan) {
       throw new NotFoundError();

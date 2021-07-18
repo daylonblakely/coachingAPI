@@ -72,7 +72,7 @@ drillSchema.plugin(updateIfCurrentPlugin);
 // Static Methods
 
 /**
- * find a ticket when processing an event
+ * find a drill when processing an event
  * find by id and the version before the event was recieved
  * this forces events to be processed in order
  */

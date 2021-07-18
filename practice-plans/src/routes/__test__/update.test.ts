@@ -1,76 +1,103 @@
-import request from "supertest";
-import mongoose from "mongoose";
-import { app } from "../../app";
+import request from 'supertest';
+import mongoose from 'mongoose';
+import { app } from '../../app';
+import { Drill } from '../../models/drill';
 
-it("returns a 400 if not authenticated", async () => {
+it('returns a 400 if not authenticated', async () => {
   // Generate a mock mongo id
   const id = new mongoose.Types.ObjectId().toHexString();
 
   await request(app).put(`/api/practice-plans/${id}`).send().expect(401);
 });
 
-it("returns a 404 if the plan is not found", async () => {
+it('returns a 404 if the plan is not found', async () => {
   // Generate a mock mongo id
   const id = new mongoose.Types.ObjectId().toHexString();
 
   await request(app)
     .put(`/api/practice-plans/${id}`)
-    .set("Cookie", global.signin())
+    .set('Cookie', global.signin())
     .send({
-      title: "afdsfas",
+      title: 'afdsfas',
       date: new Date(),
-      comments: "affdjasfklj",
+      comments: 'affdjasfklj',
     })
     .expect(404);
 });
 
-it("returns a 401 if the user does not own the plan", async () => {
-  const title = "test practice";
+it('returns a 401 if the user does not own the plan', async () => {
+  const title = 'test practice';
   const date = new Date();
-  const comments = "this is a test";
+  const comments = 'this is a test';
 
   // Create a plan with a random user
   const response = await request(app)
-    .post("/api/practice-plans")
-    .set("Cookie", global.signin())
+    .post('/api/practice-plans')
+    .set('Cookie', global.signin())
     .send({
       title,
       date,
       comments,
     });
 
+  const drill1 = Drill.build({
+    id: mongoose.Types.ObjectId().toHexString(),
+    title: 'test',
+    description: 'test',
+    category: 'Offense',
+    comments: 'test',
+    userId: 'aaaa',
+  });
+
+  const drill2 = Drill.build({
+    id: mongoose.Types.ObjectId().toHexString(),
+    title: 'test',
+    description: 'test',
+    category: 'Offense',
+    comments: 'test',
+    userId: 'aaaa',
+  });
+  await drill1.save();
+  await drill2.save();
+
   // attempt to edit the plan with a different user
   await request(app)
     .put(`/api/practice-plans/${response.body.id}`)
-    .set("Cookie", global.signin())
+    .set('Cookie', global.signin())
     .send({
-      title: "afdsfas",
+      title,
+      minutes: 45,
       date: new Date(),
-      comments: "affdjasfklj",
+      practiceNumber: 10,
+      comments: 'comment',
+      drills: [
+        { drill: drill1.id, duration: 20 },
+        { drill: drill2.id, comments: 'test' },
+      ],
     })
     .expect(401);
 });
 
-it("returns a 400 if the user provides an invalid title or date", async () => {
+it('returns a 400 if the user provides an invalid title or date', async () => {
   // save user's cookie
   const cookie = global.signin();
 
   // create the plan
   const response = await request(app)
-    .post("/api/practice-plans")
-    .set("Cookie", cookie)
+    .post('/api/practice-plans')
+    .set('Cookie', cookie)
     .send({
-      title: "afdsfas",
+      title: 'afdsfas',
       date: new Date(),
-      comments: "affdjasfklj",
+      comments: 'affdjasfklj',
     });
 
   // try update with invalid title
   await request(app)
     .put(`/api/practice-plans/${response.body.id}`)
-    .set("Cookie", cookie)
+    .set('Cookie', cookie)
     .send({
-      title: "",
+      title: '',
       date: new Date(),
     })
     .expect(400);
@@ -78,42 +105,42 @@ it("returns a 400 if the user provides an invalid title or date", async () => {
   // try update with invalid date
   await request(app)
     .put(`/api/practice-plans/${response.body.id}`)
-    .set("Cookie", cookie)
+    .set('Cookie', cookie)
     .send({
-      title: "adafa",
+      title: 'adafa',
     })
     .expect(400);
 });
 
-it("updates the plan if the plan is found and has valid inputs", async () => {
-  const title = "test practice";
+it('updates the plan if the plan is found and has valid inputs', async () => {
+  const title = 'test practice';
   const date = new Date();
-  const comments = "this is a test";
+  const comments = 'this is a test';
 
   const signinCookie = global.signin();
 
   //   create plan
   const response = await request(app)
-    .post("/api/practice-plans")
-    .set("Cookie", signinCookie)
+    .post('/api/practice-plans')
+    .set('Cookie', signinCookie)
     .send({
-      title: "fasfasd",
+      title: 'fasfasd',
       date,
-      comments: "afwuefu",
+      comments: 'afwuefu',
     })
     .expect(201);
 
   // edit the plan
   await request(app)
     .put(`/api/practice-plans/${response.body.id}`)
-    .set("Cookie", signinCookie)
+    .set('Cookie', signinCookie)
     .send({ title, date, comments })
     .expect(200);
 
   // get updated
   const planResponse = await request(app)
     .get(`/api/practice-plans/${response.body.id}`)
-    .set("Cookie", signinCookie)
+    .set('Cookie', signinCookie)
     .send();
 
   expect(planResponse.body.title).toEqual(title);
